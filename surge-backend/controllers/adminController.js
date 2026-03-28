@@ -7,7 +7,7 @@ import Product from '../models/Product.js';
 // @access  Private/Admin
 export const getUsers = async (req, res, next) => {
   try {
-    const users = await User.find({});
+    const users = await User.find({}).select('-password');
     res.json(users);
   } catch (error) {
     next(error);

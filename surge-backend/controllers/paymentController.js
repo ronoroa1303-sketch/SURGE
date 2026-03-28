@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import Razorpay from 'razorpay';
+import razorpayInstance from '../config/razorpay.js';
 import Order from '../models/Order.js';
 import Payment from '../models/Payment.js';
 import sendEmail from '../utils/emailHelper.js';
@@ -18,11 +18,15 @@ export const createRazorpayOrder = async (req, res, next) => {
       throw new Error('Order not found');
     }
 
-    // Initialize Razorpay
-    const instance = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET,
-    });
+    if (order.user.toString() !== req.user._id.toString()) {
+      res.status(403);
+      throw new Error('Not authorized for this order');
+    }
+
+    if (order.isPaid === true) {
+      res.status(400);
+      throw new Error('Order already paid');
+    }
 
     // Razorpay amount is in paise (₹1 = 100 paise)
     const options = {
@@ -31,7 +35,7 @@ export const createRazorpayOrder = async (req, res, next) => {
       receipt: `receipt_order_${order._id}`,
     };
 
-    const razorpayOrder = await instance.orders.create(options);
+    const razorpayOrder = await razorpayInstance.orders.create(options);
 
     if (!razorpayOrder) {
       res.status(500);
@@ -65,6 +69,22 @@ export const verifyRazorpayPayment = async (req, res, next) => {
       orderId 
     } = req.body;
 
+    const order = await Order.findById(orderId).populate('user', 'name email');
+    if (!order) {
+      res.status(404);
+      throw new Error('Order not found');
+    }
+
+    if (order.user._id.toString() !== req.user._id.toString()) {
+      res.status(403);
+      throw new Error('Not authorized for this order');
+    }
+
+    if (order.isPaid === true) {
+      res.status(400);
+      throw new Error('Order already paid');
+    }
+
     // Creating our own signature to compare with Razorpay's
     const body = razorpayOrderId + "|" + razorpayPaymentId;
 
@@ -86,7 +106,6 @@ export const verifyRazorpayPayment = async (req, res, next) => {
       }
 
       // Update the Order status
-      const order = await Order.findById(orderId).populate('user', 'name email');
       if (order) {
         order.isPaid = true;
         order.paidAt = Date.now();

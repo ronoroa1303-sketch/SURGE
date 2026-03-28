@@ -27,6 +27,7 @@ export const getCart = async (req, res, next) => {
 export const addToCart = async (req, res, next) => {
   try {
     const { productId, qty } = req.body;
+    const numericQty = Number(qty);
 
     const product = await Product.findById(productId);
     if (!product) {
@@ -35,7 +36,6 @@ export const addToCart = async (req, res, next) => {
     }
 
     let cart = await Cart.findOne({ user: req.user._id });
-
     if (!cart) {
       cart = await Cart.create({ user: req.user._id, items: [] });
     }
@@ -44,12 +44,21 @@ export const addToCart = async (req, res, next) => {
       (item) => item.product.toString() === productId
     );
 
+    const currentQty = itemIndex > -1 ? cart.items[itemIndex].qty : 0;
+    const projectedQty = currentQty + numericQty;
+
+    // Check if product.stock >= projected aggregate qty
+    if (product.stock < projectedQty) {
+      res.status(400);
+      throw new Error('Not enough stock');
+    }
+
     if (itemIndex > -1) {
       // Product exists, update quantity
-      cart.items[itemIndex].qty += qty;
+      cart.items[itemIndex].qty = projectedQty;
     } else {
       // Product doesn't exist, add to array
-      cart.items.push({ product: productId, qty });
+      cart.items.push({ product: productId, qty: numericQty });
     }
 
     await cart.save();

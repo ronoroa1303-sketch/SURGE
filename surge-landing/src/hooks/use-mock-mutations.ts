@@ -1,17 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { submitPreorder } from "@/lib/api";
 
-// Simulates a pre-order API call
+// Integrates with backend preorder endpoint
 export function usePreOrder() {
   const { toast } = useToast();
   
   return useMutation({
-    mutationFn: async (data: { name: string; email: string; quantity: number }) => {
-      // Simulate network latency
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      if (!data.email.includes("@")) throw new Error("Invalid email");
-      return data;
-    },
+    mutationFn: submitPreorder,
     onSuccess: () => {
       toast({
         title: "Pre-order confirmed!",
@@ -19,10 +15,10 @@ export function usePreOrder() {
         variant: "default",
       });
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Something went wrong",
-        description: "Please check your details and try again.",
+        description: error.message || "Please check your details and try again.",
         variant: "destructive",
       });
     }
