@@ -30,6 +30,10 @@ const productSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
+    category: {
+      type: String,
+      default: 'protein',
+    },
   },
   {
     timestamps: true,

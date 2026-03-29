@@ -22,7 +22,14 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.message || 'An error occurred with the API');
+    // Extract error from multiple possible backend response formats
+    const errorMsg =
+      data.message ||
+      data.error ||
+      (Array.isArray(data.errors) ? data.errors.map((e: any) => e.msg).join(', ') : null) ||
+      `Request failed (${response.status})`;
+    console.error(`API Error [${response.status}] ${endpoint}:`, data);
+    throw new Error(errorMsg);
   }
 
   return data;
@@ -41,3 +48,6 @@ export const verifyPayment = (data: any) => fetchApi('/payment/verify', { method
 // Preorder integration
 export const submitPreorder = (data: { name: string; email: string; quantity: number }) => 
   fetchApi('/preorder', { method: 'POST', body: JSON.stringify(data) });
+
+// Auth profile (for token hydration)
+export const getProfile = () => fetchApi('/auth/profile');

@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { PreOrderModal } from "@/components/PreOrderModal";
+import { useLocation } from "wouter";
 
 export function Hero() {
+  const [, navigate] = useLocation();
+
   return (
     <section className="relative min-h-[100svh] flex items-center pt-24 pb-16 overflow-hidden">
       {/* Background Gradients */}
@@ -26,7 +28,7 @@ export function Hero() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              Pre-launch Phase Active
+              Now Live — Shop Today
             </div>
             
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-black text-white leading-[1.1] mb-6 tracking-tight">
@@ -38,11 +40,9 @@ export function Hero() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-              <PreOrderModal>
-                <Button size="lg" className="w-full sm:w-auto text-lg px-8">
-                  Pre-Order Now
-                </Button>
-              </PreOrderModal>
+              <Button size="lg" className="w-full sm:w-auto text-lg px-8" onClick={() => navigate("/shop")}>
+                Shop Now
+              </Button>
               <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg px-8" asChild>
                 <a href="#features">Learn More</a>
               </Button>
