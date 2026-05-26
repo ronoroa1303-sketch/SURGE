@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+const configuredApiUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+const API_URL = configuredApiUrl || (import.meta.env.DEV ? '/api' : '');
 
 const getHeaders = () => {
   const headers: HeadersInit = {
@@ -12,15 +13,37 @@ const getHeaders = () => {
 };
 
 export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      ...getHeaders(),
-      ...options.headers,
-    },
-  });
+  if (!API_URL) {
+    throw new Error(
+      'VITE_API_URL is not configured. Set it to your deployed backend API URL, for example https://your-backend.up.railway.app/api.'
+    );
+  }
+
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        ...getHeaders(),
+        ...options.headers,
+      },
+    });
+  } catch (error) {
+    console.error(`Network error calling API endpoint ${endpoint}:`, error);
+    throw new Error(
+      'Unable to reach the SURGE API. Check that the backend is running and VITE_API_URL points to the deployed API.'
+    );
+  }
 
   const data = await response.json().catch(() => ({}));
+
+  if (response.ok && Object.keys(data).length === 0) {
+    throw new Error(
+      'The API returned an unexpected response. Check VITE_API_URL and backend deployment settings.'
+    );
+  }
+
   if (!response.ok) {
     // Extract error from multiple possible backend response formats
     const errorMsg =

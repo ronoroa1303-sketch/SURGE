@@ -54,13 +54,19 @@ export function Features() {
   return (
     <section id="features" className="py-24 bg-black/50 relative border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+          className="text-center max-w-3xl mx-auto mb-16"
+        >
           <h2 className="text-primary font-semibold tracking-wider uppercase text-sm mb-3">The Advantage</h2>
           <h3 className="text-4xl md:text-5xl font-display font-bold text-white mb-6">Why SURGE?</h3>
           <p className="text-lg text-muted-foreground">
             We stripped away the junk to deliver exactly what your body needs. No compromises.
           </p>
-        </div>
+        </motion.div>
 
         <motion.div 
           variants={containerVariants}

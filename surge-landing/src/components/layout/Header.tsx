@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useLocation } from "wouter";
 import { Menu, X, ShoppingCart, LogOut, User, Store } from "lucide-react";
+import { CartDrawer } from "@/components/CartDrawer";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -12,6 +13,7 @@ export function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { cartCount } = useCart();
   const [, navigate] = useLocation();
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -85,18 +87,19 @@ export function Header() {
                 <span className="max-w-[100px] truncate">{user?.name}</span>
               </div>
 
-              {/* Cart Icon → links to /cart */}
-              <button
-                onClick={() => navigate("/cart")}
-                className="relative p-2 text-white/70 hover:text-primary transition-colors"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                    {cartCount > 9 ? "9+" : cartCount}
-                  </span>
-                )}
-              </button>
+              {/* Cart Icon */}
+              <CartDrawer open={cartDrawerOpen} onOpenChange={setCartDrawerOpen}>
+                <button
+                  className="relative p-2 text-white/70 hover:text-primary transition-colors"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                      {cartCount > 9 ? "9+" : cartCount}
+                    </span>
+                  )}
+                </button>
+              </CartDrawer>
 
               {/* Logout */}
               <Button size="sm" variant="ghost" onClick={logout} className="text-white/70 hover:text-white">
@@ -148,10 +151,12 @@ export function Header() {
                   <User className="w-4 h-4" />
                   <span>{user?.name}</span>
                 </div>
-                <button onClick={() => { navigate("/cart"); setMobileMenuOpen(false); }} className="flex items-center gap-2">
-                  <ShoppingCart className="w-4 h-4" />
-                  <span className="text-sm">{cartCount}</span>
-                </button>
+                <CartDrawer open={cartDrawerOpen} onOpenChange={setCartDrawerOpen}>
+                  <button className="flex items-center gap-2">
+                    <ShoppingCart className="w-4 h-4" />
+                    <span className="text-sm">{cartCount}</span>
+                  </button>
+                </CartDrawer>
               </div>
               <Button variant="ghost" onClick={() => { logout(); setMobileMenuOpen(false); }} className="w-full justify-start text-white/70">
                 <LogOut className="w-4 h-4 mr-2" />

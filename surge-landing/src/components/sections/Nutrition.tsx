@@ -9,6 +9,19 @@ const stats = [
   { value: "<5g", label: "Total Fat" },
 ];
 
+const statsContainer = {
+  hidden: { opacity: 1 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+const statItem = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+};
+
 export function Nutrition() {
   return (
     <section id="nutrition" className="py-24 relative overflow-hidden">
@@ -19,7 +32,7 @@ export function Nutrition() {
           <motion.div 
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
             className="relative order-2 lg:order-1"
           >
@@ -41,15 +54,13 @@ export function Nutrition() {
               </div>
             </div>
             
-            {/* Decorative element */}
-            <div className="absolute -top-12 -left-12 w-48 h-48 bg-primary/20 rounded-full blur-[60px] -z-10"></div>
           </motion.div>
 
           {/* Right Content */}
           <motion.div 
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
             className="order-1 lg:order-2 space-y-8"
           >
@@ -63,14 +74,20 @@ export function Nutrition() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <motion.div
+              variants={statsContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              className="grid grid-cols-2 gap-4"
+            >
               {stats.map((stat, i) => (
-                <div key={i} className="glass-panel rounded-2xl p-6 text-center hover:bg-white/10 transition-colors">
+                <motion.div key={i} variants={statItem} className="glass-panel rounded-2xl p-6 text-center hover:bg-white/10 transition-colors">
                   <div className="text-3xl md:text-4xl font-display font-bold text-white mb-1">{stat.value}</div>
                   <div className="text-sm font-medium text-primary">{stat.label}</div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             <div className="pt-6">
               <PreOrderModal>
