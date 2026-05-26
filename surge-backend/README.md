@@ -92,7 +92,7 @@ Here are the critical API endpoints you can test. Remember to pass the `Authoriz
    SMTP_PORT=587
    SMTP_USER=<your_email>
    SMTP_PASS=<your_app_password>
-   ALLOWED_ORIGINS=<your_frontend_url>
+   ALLOWED_ORIGINS=https://surge-drab-one.vercel.app
    ```
    Do not set `PORT`; Railway injects it automatically.
 7. After the deployment succeeds, open the service **Settings** -> **Networking** and generate a Railway domain.
