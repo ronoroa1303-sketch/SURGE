@@ -73,11 +73,33 @@ Here are the critical API endpoints you can test. Remember to pass the `Authoriz
 ## ☁️ Deployment Instructions (Replit / Railway)
 
 ### Deploying on Railway.app (Recommended)
-1. Push this backend code to a **GitHub repository**.
-2. Go to **Railway.app** -> New Project -> Deploy from GitHub Repo.
-3. Select your backend repo.
-4. **Environment Variables:** In the Railway dashboard for the service, go to **Variables** and paste all your `.env` pairs (Mongo URI, Razorpay Keys, etc).
-5. Railway will automatically detect `package.json`, install dependencies, and start the app using `npm start`.
+1. Push the monorepo to GitHub.
+2. Go to **Railway.app** -> **New Project** -> **Deploy from GitHub Repo**.
+3. Select the repository and create a service for the backend.
+4. In the backend service **Settings**, set **Root Directory** to:
+   ```text
+   /surge-backend
+   ```
+5. Keep the default Railpack builder. The included `railway.json` makes Railway run `npm start` and healthcheck `/`.
+6. In the backend service **Variables**, add the production variables:
+   ```env
+   NODE_ENV=production
+   MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/surge
+   JWT_SECRET=<strong-random-secret>
+   RAZORPAY_KEY_ID=<your_razorpay_key_id>
+   RAZORPAY_KEY_SECRET=<your_razorpay_key_secret>
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=<your_email>
+   SMTP_PASS=<your_app_password>
+   ALLOWED_ORIGINS=<your_frontend_url>
+   ```
+   Do not set `PORT`; Railway injects it automatically.
+7. After the deployment succeeds, open the service **Settings** -> **Networking** and generate a Railway domain.
+8. Set the frontend environment variable `VITE_API_URL` to the backend API URL, for example:
+   ```env
+   VITE_API_URL=https://your-backend.up.railway.app/api
+   ```
 
 ### Deploying on Replit
 1. Open up **Replit** and import your GitHub Repository.
